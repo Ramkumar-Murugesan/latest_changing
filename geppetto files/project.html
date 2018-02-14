@@ -1,0 +1,1721 @@
+<!--
+Date Created: March 09 2016
+@author Thamizhmani
+I created a new accordian group in accordian named System Activities.
+-->
+ <script type="text/ng-template" id="toasterBodyTmpl.html">
+          <p>Find the status in the notification</p>
+        </script>
+        
+        <style>
+/*         @media screen {
+  #printSection {
+      display: none;
+  }
+}
+
+@media print {
+
+ @page
+   {
+    size: 8.5in 5.5in;
+    size: portrait;
+  }
+  body * {
+    visibility:hidden;
+  }
+  #printSection, #printSection * {
+    visibility:visible;
+  }
+  #printSection {
+    position:absolute;
+    left:auto;
+    top:auto;
+  }
+}
+
+
+ */        
+        </style>
+        <script>
+        
+        
+        function printDiv(divName) {
+            var printContents = document.getElementById(divName).innerHTML;
+            var originalContents = document.body.innerHTML;
+            //var firstElement = document.createElement("div");
+             //printContents.appendChild(firstElement.firstChild);
+            document.body.innerHTML = printContents;
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
+       }
+        
+        
+       /*  document.getElementById("printbutton").onclick = function () {
+            printElement(document.getElementById("printElement"));
+            
+            var modThis = document.querySelector("#printElement");
+            modThis.appendChild(document.createTextNode(" new"));
+            
+            window.print();
+        }
+
+        function printElement(elem) {
+            var domClone = elem.cloneNode(true);
+            
+            var $printSection = document.getElementById("printSection");
+            
+            if (!$printSection) {
+                var $printSection = document.createElement("div");
+                $printSection.id = "printSection";
+                document.body.appendChild($printSection);
+            }
+            
+            $printSection.innerHTML = "";
+            
+            $printSection.appendChild(domClone);
+        }
+ */        </script>
+        
+<header class="user"
+	data-ng-include="'app/views/en-US/user/header.html'"></header>
+	<toaster-container toaster-options="{'time-out': 3000, 'close-button':true}"></toaster-container>
+<div class="project">
+	<h1 class="title">Manage Project</h1>
+	<tabset class="tabs"> <tab heading="General Information"
+		active="tabprojectactive">
+	<div class="general">
+		<form class="properties" name="myForm">
+			<div class="item">
+				<label for="name">Name</label> <input type="text" name="name"
+					class="form-control" id="name" placeholder="Enter name"
+					data-ng-model="project.projectName" data-ng-required="true"
+					validator name-before-edit="{{json.name}}" name-type="project"
+					project-id="{{json.id}}" data-ng-maxlength="50">
+				<ul class="error-msgs" data-ng-messages="myForm.name.$error"
+					style="color: red; font-style: italic;">
+					<li data-ng-message="whiteSpaceValidator">Whitespace not
+						allowed!</li>
+					<li data-ng-message="no_specialCharacterValidator">No Special
+						characters are not allowed!</li>
+					<li data-ng-message="specialCharacterValidator">Special
+						characters except underscore & hyphen, are not allowed!</li>
+					<li data-ng-message="uniqueNameValidator">Name already taken!</li>
+					<li data-ng-message="startAlphabetValidator">Name should start
+						with an alphabet!</li>
+					<li data-ng-message="restrictedNameValidator">This word is a
+						reserved keyword.Please try another name!</li>
+					<li
+						data-ng-show="myForm.name.$dirty && myForm.name.$error.maxlength">Name
+						can have maximum 50 characters!</li>
+					<li
+						data-ng-show="myForm.name.$dirty && myForm.name.$error.required">Name
+						is required!</li>
+				</ul>
+			</div>
+			<div class="item">
+				<label for="label">Label</label> <input type="text"
+					class="form-control" id="label" placeholder="Enter label"
+					data-ng-model="project.projectLabel">
+			</div>
+			<div class="item">
+				<div class="form-group">
+					<label for="entity">App Context</label> <input type="text"
+						class="form-control" placeholder="Enter App Context" id="entity"
+						name="entity" data-ng-model="project.projectCompany"
+						data-ng-required="true" validator
+						name-before-edit="{{json.entity}}" project-id="{{json.id}}"
+						name-type="entity">
+					<ul class="error-msgs" data-ng-messages="myForm.entity.$error"
+						style="color: red; font-style: italic;">
+						<li data-ng-message="whiteSpaceValidator">Whitespace not
+							allowed!</li>
+						<li data-ng-message="no_specialCharacterValidator">No Special
+							characters are not allowed!</li>
+						<li data-ng-message="startValidator">App Context should start
+							with an alphabet!</li>
+						<li
+							data-ng-show="myForm.entity.$dirty && myForm.entity.$error.required">Name
+							is required!</li>
+					</ul>
+				</div>
+			</div>
+			<div class="item">
+				<label for="primary">Primary Language</label> <select
+					data-ng-model="project.mainLanguage" class="form-control"
+					data-ng-options="opt.name for opt in mainLanguages track by opt.id"
+					data-ng-change="additionalLanguageDropdown(project.mainLanguage.name)">
+					<option value="0" selected="selected">Primary Language</option>
+				</select>
+
+			</div>
+			<div class="item">
+				<label for="secondary">Secondary Languages</label>
+				<div data-ng-dropdown-multiselect="" options="additionalLanguages"
+					selected-model="selectedadditionallanguage"
+					extra-settings="multiselectsettings"></div>
+			</div>
+			<div class="item">
+				<label for="description">Description</label> <input type="text"
+					class="form-control" id="description"
+					placeholder="Enter description"
+					data-ng-model="project.projectDescription">
+			</div>
+			<!-- 	<div class="item">
+                <label>Type</label>
+                <div class="type">
+                  <label class="form-checkbox">
+                    <input type="checkbox" checked>
+                    <span>Desktop / Laptop</span>
+                  </label>
+                  <label class="form-checkbox">
+                    <input type="checkbox" checked>
+                    <span>Mobile</span>
+                  </label>
+                </div>
+              </div> -->
+		</form>
+		<hr>
+		<div ng-if="!pending">
+			<div class="action">
+				<button class="btn complete" style="width: 13%;"
+					data-ng-click="beforeGenerateModal()">Generate</button>
+			</div>
+		</div>
+		<div ng-if="pending">
+			<button type="button" class="btn btn-primary" data-toggle="modal"
+				data-backdrop='static' 
+				ng-click="beforepayment()">
+				<span class="glyphicon glyphicon-credit-card"></span> Generate
+			</button>
+			</button>
+		</div>
+
+		<hr>
+		<div class="action">
+			<button class="btn complete"
+				data-ng-disabled="myForm.name.$invalid || myForm.name.$pending || myForm.entity.$invalid"
+				data-ng-click="submitProject()" data-ng-show="showcreate">
+				Save</button>
+			<button class="btn complete"
+				data-ng-disabled="myForm.name.$invalid || myForm.name.$pending || myForm.entity.$invalid || myForm.entity.$pending"
+				data-ng-click="updateProject()" data-ng-show="!showcreate">
+				Save</button>
+			<button class="btn danger"
+				data-ng-click="openDeleteDialog('sm',json.id)">Delete</button>
+		</div>
+		<br>
+		<accordion> <accordion-group
+			heading="Technical Architecture" class="architecture">
+		<form>
+			<div class="client">
+				<h3 class="title">Client Properties</h3>
+				<div class="item">
+					<label for="client-dev-lang">Client Development Languages</label> <select
+						class="form-control" data-ng-model="selectedclientdevlanguage"
+						data-ng-options="opt.label for opt in clientdevlanguage track by opt.id"></select>
+				</div>
+				<div class="item">
+					<label for="client-dev-frame">Client Development Frameworks</label>
+					<select class="form-control"
+						data-ng-model="selectedclientdevframework"
+						ng-change="test(selectedclientdevframework)"
+						data-ng-options="cdf.label for cdf in clientdevframework track by cdf.id"></select>
+				</div>
+				<!--
+				<div class="item">
+					<label for="client-dev-css">Client Desktop CSS Framework</label> <select
+						class="form-control" data-ng-model="project.desktopCssFramework"
+						data-ng-options="cdc.label for cdc in desktopCssFrameworks track by cdc.id"></select>
+				</div>
+				<div class="item">
+					<label for="client-dev-css">Client Mobile CSS Framework</label> <select
+						class="form-control" data-ng-model="project.mobileCssFramework"
+						data-ng-options="cdc.label for cdc in mobileCssFrameworks track by cdc.id"></select>
+				</div>
+				
+				<div class="item">
+					<label for="client-os">Client OS</label>
+					<div data-ng-dropdown-multiselect="" options="clientOS"
+						selected-model="selectedClientOS"
+						extra-settings="multiselectsettings"></div>
+				</div>
+				 
+				<div class="item">
+					<label for="device-types">Device Types</label>
+					<div data-ng-dropdown-multiselect="" options="clientDeviceTypes"
+						selected-model="selectedclientdevicetypes"
+						extra-settings="multiselectsettings"></div>
+				</div>
+				 
+				<div class="item">
+					<label for="supported-browsers">Supported Browsers</label>
+					<div data-ng-dropdown-multiselect="" options="browsers"
+						selected-model="selectedbrowsers"
+						extra-settings="multiselectsettings"></div>
+				</div>
+				<div class="item">
+					<label>Mobile Only</label>
+					<div class="mobile-only">
+						<label>Stand Alone</label> <label class="form-radio"> <input
+							type="radio" data-ng-value="true"
+							data-ng-model="project.stand_alone_app"> <span>Yes</span>
+						</label> <label class="form-radio"> <input type="radio"
+							data-ng-value="false" data-ng-model="project.stand_alone_app">
+							<span>No</span>
+						</label>
+					</div>
+				</div>
+				-->
+			</div>
+			<div class="server">
+				<h3 class="title">Server Properties</h3>
+				<!--  
+				<div class="item">
+					<label for="server-run-env">Server Runtime Environment</label> <select
+						data-ng-model="project.serverRunTime" class="form-control"
+						data-ng-options="opt.name for opt in serverRunTimes track by opt.id"></select>
+				</div>
+				<div class="item">
+					<label for="server-os">Server OS</label> <select
+						data-ng-model="project.serverOs" class="form-control"
+						data-ng-options="opt.name for opt in serverOS track by opt.id"></select>
+				</div>
+				-->
+				<div class="item">
+					<label for="server-dev-lang">Server Development Language</label> <select
+						class="form-control"
+						data-ng-model="project.serverDevelopmentLanguage"
+						data-ng-options="opt.label for opt in serverLanguages track by opt.id"></select>
+				</div>
+				<div class="item">
+					<label for="server-dev-frame">Server Development Framework</label>
+					<select class="form-control"
+						data-ng-model="project.serverDevelopmentFramework"
+						data-ng-options="opt.label for opt in serverDevFramework track by opt.id"></select>
+				</div>
+				<div class="item">
+					<label for="database">Database</label> <select class="form-control"
+						data-ng-model="project.serverDbms"
+						data-ng-options="opt.label for opt in serverDBMS track by opt.id"></select>
+				</div>
+			</div>
+			<div class="miscellaneous">
+				<h3 class="title">Miscellaneous</h3>
+				<!--  
+				<div class="item">
+					<label>Communication Protocol</label>
+					<div class="protocol">
+						<label class="form-radio"> <input id="sec" type="radio"
+							name="Protocal" data-ng-value="true"
+							data-ng-model="project.communication_protocal"> <span>Secured</span>
+						</label> <label class="form-radio"> <input id="non-sec"
+							type="radio" name="Protocal" data-ng-value="false"
+							data-ng-model="project.communication_protocal"> <span>Non-Secured</span>
+						</label>
+					</div>
+				</div>
+				<div class="item">
+					<label for="default-mod-labels">Default Module Labels</label> <input
+						type="text" class="form-control" id="default-mod-labels"
+						placeholder="Enter default module labels"
+						data-ng-model="project.default_module_label">
+				</div>
+				-->
+				<div class="item">
+					<label>Application Type</label> <select
+						data-ng-model="project.application_type" class="form-control"
+						data-ng-options="opt.name for opt in Apptype track by opt.id"></select>
+				</div>
+				<br>
+				<!-- <div class="item">
+					<h3 class="title">LotusNotes Database</h3>
+					<div class="protocol">
+						<label class="form-radio"> <input id="sec" type="radio"
+							ng-value="true" ng-model="project.lotus_notes_enabled"> <span>Enable</span>
+						</label> <label class="form-radio"> <input id="sec" type="radio"
+							ng-value="false" ng-model="project.lotus_notes_enabled">
+							<span>Disable</span>
+						</label>
+					</div>
+					<div ng-show="project.lotus_notes_enabled">
+						<label>Give Datasource Connectivity</label> <input
+							ng-model="project.extra_project_info.mongo.url" type="text"
+							class="form-control" id="label" placeholder="host"> <input
+							ng-model="project.extra_project_info.mongo.port" type="text"
+							class="form-control" id="label" placeholder="port"> <input
+							ng-model="project.extra_project_info.mongo.db_name" type="text"
+							class="form-control" id="label" placeholder="Database Name">
+						<div class="protocol">
+							<label> MongoDB Credentials ?</label> <label class="form-radio">
+								<input id="sec" type="radio" ng-value="true"
+								ng-model="project.lotus_notes_cred_enabled"> <span>Yes</span>
+							</label> <label class="form-radio"> <input id="sec" type="radio"
+								ng-value="false" ng-model="project.lotus_notes_cred_enabled">
+								<span>No</span>
+							</label>
+						</div>
+						<div ng-show="project.lotus_notes_cred_enabled">
+							<input ng-model="project.extra_project_info.cred.username"
+								type="text" class="form-control" id="label"
+								placeholder="DB_Username"> <input
+								ng-model="project.extra_project_info.cred.password" type="text"
+								class="form-control" id="label" placeholder="DB_passwd">
+						</div>
+					</div>
+				</div> -->
+				<div class="item">
+					<label>Server deployment target</label> <select
+						ng-model="project.server_deployment_target" class="form-control"
+						ng-options="opt.label for opt in server_deployment_target track by opt.id"></select>
+				</div>
+				<div class="item">
+					<label>User deployment target</label> <select
+						ng-model="project.user_deployment_target" class="form-control"
+						ng-options="opt.label for opt in user_deployment_target track by opt.id"></select>
+				</div>
+			</div>
+
+		</form>
+		</accordion-group> <accordion-group heading="Documentation" class="docs">
+		<textarea data-ck-editor data-ng-model="project.projectNotes"></textarea>
+		</accordion-group> </accordion>
+		<div class="action">
+			<button class="btn complete"
+				data-ng-disabled="myForm.name.$invalid || myForm.name.$pending || myForm.entity.$invalid"
+				data-ng-click="submitProject()" data-ng-show="showcreate">Save
+			</button>
+			<button class="btn complete"
+				data-ng-disabled="myForm.name.$invalid || myForm.name.$pending || myForm.entity.$invalid"
+				data-ng-click="updateProject()" data-ng-show="!showcreate">Update
+			</button>
+			<button class="btn danger"
+				data-ng-click="openDeleteDialog('sm',json.id)">Delete</button>
+		</div>
+	</div>
+	</tab> <tab heading="Noun Design" active="tabnounactive"
+		select="currentTab()"> <!-- accordion starts --> <accordion>
+
+
+	<accordion-group heading="User Nouns" is-open="true" class="user-nouns">
+	<div class="nouns">
+		<button class="btn complete add"
+			data-ng-click="openModal('create','noun','sm');">
+			<i class="fa fa-plus-circle"></i> <span>Add</span>
+		</button>
+		<br>
+		<ul data-ng-if="nouns.length">
+			<li data-ng-repeat="n in nouns">
+				<h3 class="title lead">{{n.name}}</h3>
+				<h4 class="label">{{n.label}}</h4>
+				<p class="description">{{n.description}}</p>
+				<div class="action">
+					<button class="btn success edit" data-ng-click="updateNoun(n)">
+						<i class="fa fa-pencil-square-o"></i> <span>Edit</span>
+					</button>
+					<button class="btn danger delete"
+						data-ng-click="setDeleteNounObj(n); openModal('delete', 'noun', 'sm');">
+						<i class="fa fa-trash-o"></i> <span>Delete</span>
+					</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+	</accordion-group> <accordion-group heading="ERD" is-open="true" class="user-nouns">
+
+	<div class="nouns">
+		<div>
+			<label>List of ERD Diagram</label>
+			<button class="btn complete add" style="float: right"
+				data-ng-click="mxgrapheditor()">
+				<i class="fa fa-plus-circle"></i> <span>create</span>
+			</button>
+		</div>
+		<ul data-ng-if="erds.length">
+			<li data-ng-repeat="erd in erds">
+				<h3 class="title lead">{{erd.filename}}</h3>
+				<h4 class="label">{{erd.filename}}</h4>
+				<p class="description">{{erd.filename}}</p>
+				<div class="action">
+					<button class="btn success edit" data-ng-click="updateerd(erd)">
+						<i class="fa fa-pencil-square-o"></i> <span>Edit</span>
+					</button>
+					<button class="btn success edit" data-ng-click="erd_parser(erd)">
+						<span>Add to Project</span>
+					</button>
+					<button class="btn danger delete"
+						data-ng-click="deleteerd(erd); openModal('delete', 'ERD', 'sm');">
+						<i class="fa fa-trash-o"></i> <span>Delete</span>
+					</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+	<hr>
+
+	</accordion-group> <!--   <accordion-group heading="Import Noun" class="other-nouns">
+	<div class="nouns">
+		<div class="form-group"></div>
+		<label>Select the DB to import noun</label>
+			<select class="form-control" style="width: 500px; height: 35px;"  data-ng-change = "valuechange(value)">
+				<option value="">---Select DB ---</option>
+				<option value="MongoDB">MongoDB</option>
+				<option value="CouchBase">CouchBase</option>
+			</select>
+			<br>
+		<button class="btn complete add" ng-disabled="isDisabled"
+			data-ng-click="import_other_noun()">
+			<i class="fa fa-plus-circle"></i> <span>Import Database</span>
+		</button>
+		<br>
+
+		<div class="form-group">
+  <label for="usr">Add WSDL Link:</label>
+  <input type="text" class="form-control" id="usr">
+  <button class="btn complete add" data-ng-click="addWsdlLink()">
+			<i class="fa fa-plus-circle"></i> <span>Add</span>
+		</button>
+</div>
+		<br>
+		<div data-ng-if="other_nouns.length">
+			<select class="form-control" style="width: 500px; height: 35px;"
+				ng-model="SelectedDb" ng-change="get_mongo_noun(SelectedDb)"
+				data-ng-options="one_noun.db_name for one_noun in other_nouns">
+				<option value="">---Select Source---</option>
+			</select>
+		</div>
+		<div data-ng-if="other_nouns.length">
+
+			<form class="form-inline">
+				<div data-ng-if=true>
+					<div class="form-group"
+						style="width: 250px; height: 35px; margin-left: 44px">
+						<label for="label">Bucket</label>
+					</div>
+					<div class="form-group"
+						style="width: 250px; height: 35px; margin-left: 44px">
+						<label for="description">Design Document</label>
+					</div>
+					<div class="form-group"
+						style="width: 250px; height: 35px; margin-left: 44px">
+						<label for="description">Views</label>
+					</div>
+				</div>
+			</form>
+			<form class="form-inline">
+				<div data-ng-if=true>
+					<div class="form-group">
+
+						<select class="form-control"
+							style="width: 250px; height: 35px; margin-left: 44px"
+							ng-model="SelectedDb" ng-change="get_couch_noun(SelectedDb)"
+							data-ng-options="one_noun.bucket for one_noun in other_nouns">
+							<option value="">---Select Source---</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<select class="form-control"
+							style="width: 250px; height: 35px; margin-left: 44px"
+							ng-model="Selecteddesign"
+							ng-change="get_couch_design(Selecteddesign)"
+							data-ng-options="one_noun.design for one_noun in couch_desing">
+							<option value="">---Select Source---</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<select class="form-control"
+							style="width: 250px; height: 35px; margin-left: 44px"
+							ng-model="Selectedviews"
+							ng-change="get_couch_views(Selectedviews)"
+							data-ng-options="one_noun.views for one_noun in couch_views">
+
+							<option value="">---Select Source---</option>
+						</select>
+
+
+					</div>
+				</div>
+			</form>
+		</div>
+		 <button class="btn complete add" style: data-ng-click="view_import_other_noun()">
+              <i class="fa fa-plus-circle"></i>
+              <span>View Imported Noun</span>
+          </button>
+
+		<ul data-ng-if="list_of_mongo_nouns.length">
+			<li data-ng-repeat="n in list_of_mongo_nouns">
+				<h3 class="title lead">{{n.bucket}}</h3>
+				<h3 class="label">attributes of {{n.views}}</h3>
+
+				<div class="action">
+
+					<button class="btn complete add" data-ng-click="addDefaultNoun(n)">
+						<i class="fa fa-plus-circle"></i> <span>Add Nouns to
+							project</span>
+					</button>
+				</div>
+			</li>
+		</ul>
+
+	</div>
+	</accordion-group> --> <!-- WSDL endpoint  --> <!-- <accordion-group heading="WSDL" class="wsdl">
+	<form class="form-inline" name="myForm">
+		<div class="form-group">
+			<label>Add WsdL Link</label> <input id="msg" type="text"
+				class="form-control" name="msg" data-ng-model="link.wsdl_endpoint"
+				placeholder="Link ...">
+			<button class="btn complete add"
+				data-ng-click="addWsdlLink(link.wsdl_endpoint)"
+				data-ng-disabled="!myForm.msg.$valid">
+				<i class="fa fa-plus-circle"></i> <span>Save</span>
+			</button>
+		</div>
+	</form>
+	<div class="nouns">
+		<form class="form-group">
+			<br>
+			<button class="btn complete add" data-ng-click="noun_wsdl()">
+				<i class="fa fa-plus-circle"></i> <span>Import Nouns From
+					WSDL</span>
+			</button>
+		</form>
+		<br>
+		<div data-ng-if="wsdlname.length">
+
+			<form class="form-inline">
+				<div data-ng-if=true>
+					<div class="form-group"
+						style="width: 250px; height: 35px; margin-left: 44px">
+						<label for="description">WSDL</label>
+					</div>
+				</div>
+			</form>
+			<form class="form-inline">
+				<div data-ng-if=true>
+					<div class="form-group">
+						<select class="form-control"
+							style="width: 250px; height: 35px; margin-left: 44px"
+							ng-model="SelectedWSDL" ng-change="get_class(SelectedWSDL)"
+							data-ng-options="wsdl.wsdl_name for wsdl in wsdlname">
+
+							<option value="">---Select Source---</option>
+						</select>
+					</div>
+				</div>
+			</form>
+		</div>
+		<ul data-ng-if="classname.length">
+			<li data-ng-repeat="n in classname">
+				<h3 class="title lead">{{n.class_name}}</h3>
+				<h3 class="label">attributes of {{n.class_name}}</h3>
+
+				<div class="action">
+
+					<button class="btn complete add" data-ng-click="addwsdlNoun(n)">
+						<i class="fa fa-plus-circle"></i> <span>Add Nouns to
+							project</span>
+					</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+	</accordion-group>  --> <!-- Lotus Notes  --> <accordion-group
+		heading="LotusNotes"> <!--  
+                    <h4>Add LotusNotes:</h4>
+                    <br>
+                    <button data-toggle="collapse" style="float: right;" data-target="#createLotus" class="btn complete add">
+                        <i class="fa fa-plus-circle"></i>
+                        <span>ADD</span>
+                    </button>
+                    <br>
+                    -->
+	<h4>DXL Parser:</h4>
+	<br>
+	<div style="width: 100%; float: left">
+		<span style="width: 70%; float: left"> <input
+			class="btn btn-default btn-file" type="file" name="file"
+			ng-model="file" id="file" data-rule-required="true">
+		</span> <span style="width: 30%; float: left"> <input type="submit"
+			class="btn complete add pull-right" ng-click="uploadlotusdxlfile()"
+			data-toggle="modal" data-target="#myModal">
+		</span>
+	</div>
+	<!-- 
+                    <div class="row collapse" id="createLotus" style="padding-left: 30px;">
+                        <form name="myForm1" class="form-group form-inline">
+                            <label class="control-label" for="first">Add Server URL : </label>
+                            <input id="msg" type="text" class="form-control" name="msg" data-ng-model="lotusNote.server_url"
+                                placeholder="url ..." style="width: 500px; height: 35px;" required>
+                        </form>
+                        <div class="item">
+
+                            <div ng-show="true">
+                                <div class="protocol">
+                                    <h4 class="title">LotusNote credentials:</h4>
+                                    <label class="form-radio">
+                                        <input id="sec" type="radio" ng-value="true" ng-model="enableList">
+                                        <span>Yes</span>
+                                    </label>
+                                    <label class="form-radio">
+                                        <input id="sec" type="radio" ng-value="false" ng-model="enableList">
+                                        <span> No</span>
+                                    </label>
+                                </div>
+                                <div ng-show="enableList">
+                                    <form name="myForm1" class="form-group form-inline">
+                                        <label class="control-label" for="first">Username: </label>
+                                        <input id="msg" type="text" class="form-control" name="msg" data-ng-model="lotusNote.server_username"
+                                            placeholder="Username" style="width: 500px; height: 35px;" required>
+                                    </form>
+                                    <form name="myForm1" class="form-group form-inline">
+                                        <label class="control-label" for="first">Password: </label>
+                                        <input id="msg" type="text" class="form-control" name="msg" data-ng-model="lotusNote.server_password"
+                                            placeholder="Password" style="width: 500px; height: 35px;" required>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn complete add" data-ng-click="addLotusNotes(lotusNote.server_url)">
+
+                            <i class="fa fa-plus-circle"></i>
+                            <span>Save</span>
+                        </button>
+                    </div>
+                     
+                    <div style="padding-left: 30px; padding-top: 50px;" data-ng-repeat="lotusNote in lotusNoteData">
+                        <form name="myForm1" class="form-group form-inline">
+                            <label class="control-label" for="first">Update LotusNote : </label>
+                            <input id="msg" type="text" class="form-control" name="msg" data-ng-model="lotusNote.server_url" placeholder="url ..." style="width: 500px; height: 35px;"
+                                required>
+                        </form>
+                        <form name="myForm1" class="form-group form-inline">
+                            <label class="control-label" for="first">Username: </label>
+                            <input id="msg" type="text" class="form-control" name="msg" data-ng-model="lotusNote.server_username"
+                                placeholder="Username" style="width: 500px; height: 35px;" required>
+                        </form>
+                        <form name="myForm1" class="form-group form-inline">
+                            <label class="control-label" for="first">Password: </label>
+                            <input id="msg" type="text" class="form-control" name="msg" data-ng-model="lotusNote.server_password"
+                                placeholder="Password" style="width: 500px; height: 35px;" required>
+                        </form>
+                        <form name="myForm1" class="form-group form-inline">
+                            <button class="btn complete add" data-ng-click="updateLotusNote(lotusNote)" data-ng-disabled="!myForm1.msg.$valid">
+                                <i class="fa fa-plus-circle"></i>
+                                <span>Update</span>
+                            </button>
+                            <button class="btn danger delete" data-ng-click="deleteLotusNote(lotusNote)">
+                                <i class="fa fa-trash-o"></i>
+                                <span>Delete</span>
+                            </button>
+                    </div>
+                    -->
+
+	<div class="nouns">
+		<!--  <form class="form-group">
+			<br>
+			<button class="btn complete add" data-ng-click="noun_wsdl()">
+				<i class="fa fa-plus-circle"></i> <span>Import Nouns From
+					WSDL</span>
+			</button>
+		</form>-->
+		<br>
+		<div data-ng-if="lotusname.length">
+
+			<form class="form-inline">
+				<div data-ng-if=true>
+					<div class="form-group"
+						style="width: 250px; height: 35px; margin-left: 44px">
+						<label for="description">LotusNotes</label>
+					</div>
+				</div>
+			</form>
+			<form class="form-inline">
+				<div data-ng-if=true>
+					<div class="form-group">
+						<select class="form-control"
+							style="width: 250px; height: 35px; margin-left: 44px"
+							ng-model="SelectedLOTUS"
+							ng-change="get_Lotus_Nouns(SelectedLOTUS)"
+							data-ng-options="lotus.lotus_name for lotus in lotusname">
+
+							<option value="">---Select Source---</option>
+						</select>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<ul data-ng-if="classname.length">
+			<li data-ng-repeat="n in classname">
+				<h3 class="title lead">{{n.class_name}}</h3>
+				<h3 class="label">attributes of {{n.class_name}}</h3>
+
+				<div class="action">
+
+					<button class="btn complete add" data-ng-click="addLotusNoun(n)">
+						<i class="fa fa-plus-circle"></i> <span>Add Nouns to
+							project </span>
+					</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+	</accordion-group> <!-- Rest API endpoint  --> <!-- 		<div class="item">
+		<label class="control-label">Add Rest Swagger Doc Link, Click Here: </label>
+		</div> <br>
+ --> <!-- <accordion-group
+		heading="RestAPI-Endpoint">
+	<button data-toggle="collapse" data-target="#createRest"
+		class="btn complete add">
+		<i class="fa fa-plus-circle"></i> <span>ADD NEW SWAGGER DOC</span>
+	</button>
+	<br>
+	<div class="row collapse" id="createRest" style="padding-left: 30px;">
+		<form name="myForm2" class="">
+			<label class="control-label" for="first">Rest Swagger Doc URL
+			</label> <input id="msg" type="text" class="form-control" name="msg"
+				data-ng-model="restlink.rest_endpoint" placeholder="Link ..."
+				style="width: 500px; height: 35px;" required>
+		</form>
+		<form name="myForm2" class="">
+			<label class="control-label" for="first">Base API URL </label> <input
+				id="msg" type="text" class="form-control" name="msg"
+				data-ng-model="restlink.base_url" placeholder="Link ..."
+				style="width: 500px; height: 35px;" required>
+		</form>
+		<br>
+		<button class="btn complete add"
+			data-ng-click="addrestLink(restlink.rest_endpoint)"
+			data-ng-disabled="!myForm2.msg.$valid">
+			<i class="fa fa-plus-circle"></i> <span>Save</span>
+		</button>
+	</div>
+	<br />
+	
+	<hr>
+	<div class="nouns">
+		<div data-ng-if="restNounEndPointList.length">
+			<div class="item">
+				<label for="description"
+					style="text-align: center; padding-top: 10px; padding-left: 10px;">Select
+					Swagger Doc URL</label>
+			</div>
+			<br>
+			<div class="item">
+				<select class="form-control"
+					style="width: 250px; height: 35px; margin-left: 10px"
+					ng-model="SelectedSwaggerNoun"
+					ng-change="get_swagger_endpoint_details(SelectedSwaggerNoun)"
+					data-ng-options="swagger_noun.rest_endpoint for swagger_noun in restNounEndPointList">
+					<option value="">---Select Swagger Doc URL---</option>
+				</select>
+			</div>
+
+			<ul data-ng-show="displaysec"
+				style="width: 100%; display: table; table-layout: fixed;">
+				<div style="padding-left: 10px; padding-top: 10px;">
+					<li class="primary-noun" style="width: 40%; display: table-cell;">
+						<form name="myForm1" class="form-group form-inline">
+							<div class="item">
+								<label for="description"
+									style="text-align: center; padding-top: 10px; padding-left: 10px;">ADD
+									RESPONSE OBJECT</label>
+							</div>
+							<br> <label for="description" style="margin-left: 10px">Select
+								API URL</label>
+							<div class="item">
+								<select class="form-control"
+									style="width: 250px; height: 35px; margin-left: 10px"
+									ng-model="selectedrestapi"
+									ng-change="getInputParams(selectedrestapi)"
+									data-ng-options="api.restapi for api in restApiList">
+
+									<option value="">---Select API URL---</option>
+								</select>
+								<label for="description"
+									style="text-align: center; padding-top: 10px; padding-left: 10px;">{{operationmethod | uppercase}}
+									</label>
+							</div>
+							<br>
+							<div ng-if="displayToSave == true">
+								<div data-ng-repeat="params in inputparams">
+									<br>
+									<div class="item">
+										<label for="label" style="margin-left: 10px">{{params.operation_parameter_name}}</label>
+									</div>
+									<div class="item">
+										<input class="form-control"
+											style="height: 35px; width: 80%; margin-left: 10px"
+											type="text" data-ng-model="params.operation_param_value" />
+									</div>
+									<br>
+								</div>
+								<br>
+
+								<div>
+									 ng-if="inputparams.length"
+									<div class="checkbox">
+										<label><input type="checkbox"
+											style="margin-left: 10px"
+											data-ng-model="responseobjecttype.value" ng-true-value="-1"
+											ng-false-value="0">Response As Object</label>
+									</div>
+									<div ng-if="responseobjecttype.value != -1">
+										<div class="item">
+										     <label>
+											<input class="form-control"
+												style="width: 500px; height: 35px; margin-left: 10px"
+												type="text" data-ng-model="jsonwrapperkey.val">Enter the Wrapper JSON Key</label>
+										</div>
+									</div>
+									<br>
+									<button class="btn complete add" style="margin-left: 10px"
+										data-ng-click="saveResponseObject(responseobjecttype.value,jsonwrapperkey.val)">
+										<i class="fa fa-plus-circle"></i> <span> SAVE Response
+										</span>
+									</button>
+								</div>
+							</div>
+							<div ng-if="displayToSave == false">
+								<div data-ng-repeat="params in updateparams">
+									<br>
+									<div class="item">
+
+										<label for="label" style="margin-left: 10px">{{params.operation_parameter_name}}</label>
+									</div>
+									<div class="item">
+										<input class="form-control"
+											style="width: 500px; height: 35px; margin-left: 10px"
+											type="text" data-ng-model="params.operation_parameter_value" />
+									</div>
+									<br>
+								</div>
+								<button class="btn complete add" style="margin-left: 10px"
+									data-ng-click="updateResponseObject()">
+									<i class="fa fa-plus-circle"></i> <span> UPDATE </span>
+								</button>
+							</div>
+						</form>
+					</li>
+				</div>
+				<li class="primary-noun"
+					style="width: 40%; display: table-cell; margin-left: 20px;">
+					<div class="item">
+						<label for="description"
+							style="text-align: center; padding-top: 10px; padding-left: 10px;">UPDATE
+							SWAGGER DOC</label>
+					</div> <br>
+					<div style="padding-left: 10px; padding-top: 10px;">
+						 data-ng-repeat="restlinks in restLinkData"
+						<label class="control-label" for="first">Update Rest
+							Swagger Doc URL</label> <input id="msg" type="text" class="form-control"
+							name="msg" data-ng-model="restLinkData.rest_endpoint"
+							placeholder="Link ..." style="height: 35px;" required> <label
+							class="control-label" for="first">Update Base API URL </label> <input
+							id="msg" type="text" class="form-control" name="msg"
+							data-ng-model="restLinkData.base_url" placeholder="Link ..."
+							style="height: 35px;" required> <br>
+						<ul>
+							<li>
+								<button class="btn complete delete"
+									data-ng-click="updateRestEdPoint(restLinkData)">
+									<i class="fa fa-plus-circle"></i> <span>Update</span>
+								</button>
+							</li>
+							<li>
+								<button class="btn danger delete"
+									data-ng-click="deleteRestEdPoint(restLinkData)">
+									<i class="fa fa-trash-o"></i> <span>Delete</span>
+								</button>
+							</li>
+						</ul>
+					</div>
+				</li>
+
+			</ul>
+
+		</div>
+	</div>
+	<hr>
+	<div class="nouns">
+		<br>
+		<button class="btn complete add"
+			data-ng-click="get_all_noun_rest_endpointForImport()">
+			<i class="fa fa-plus-circle"></i> <span>Import Nouns From REST
+				EndPoint</span>
+		</button>
+		<br>
+
+		<div data-ng-if="restNounEndPointLists.length">
+
+			<form class="form-inline">
+				<div data-ng-if=true>
+					<div class="form-group"
+						style="width: 250px; height: 35px; margin-left: 44px">
+						<label for="description">Swagger Noun</label>
+					</div>
+				</div>
+			</form>
+			<form class="form-inline">
+				<div data-ng-if=true>
+					<div class="form-group">
+						<select class="form-control"
+							style="width: 250px; height: 35px; margin-left: 44px"
+							ng-model="SelectedSwaggerNoun"
+							ng-change="get_swagger_endpoint_noun(SelectedSwaggerNoun)"
+							data-ng-options="swagger_noun.rest_endpoint for swagger_noun in restNounEndPointLists">
+
+							<option value="">---Select Source---</option>
+						</select>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<ul data-ng-if="SelectedSwaggerNounList.length">
+			<li data-ng-repeat="n in SelectedSwaggerNounList">
+				<h3 class="title lead">{{n.operationname}}</h3>
+				<h3 class="label">attributes of {{n.operationname}}</h3>
+
+				<div class="action">
+
+					<button class="btn complete add"
+						data-ng-click="addSwaggerRestEndpointNoun(n)">
+						<i class="fa fa-plus-circle"></i> <span>Add Nouns to
+							project</span>
+					</button>
+				</div>
+			</li>
+		</ul>
+
+	</div>
+
+	</accordion-group>  --></accordion> </tab> <!-- User Credentials --> <!--  <div class="item">
+	<h3 class="title">Rest End point credentials</h3>
+		<div ng-show="true">
+			<div class="protocol">
+				<label class="form-radio"> <input id="sec" type="radio"
+					ng-value="true" ng-model="enableList"> <span>Yes</span>
+				</label> <label class="form-radio"> <input id="sec" type="radio"
+					ng-value="false" ng-model="enableList"> <span>No</span>
+				</label>
+			</div>
+			<div ng-show="enableList">
+				<label> App Credentials</label> <input ng-model="restlink.auth_token"
+					type="text" class="form-control" id="label" placeholder="Auth_Token">
+				<br />
+				<input ng-model="restlink.app_token" type="text" class="form-control"
+					id="label" placeholder="App_Token">
+			</div>
+		</div>
+ 		<br />
+		<button class="btn complete add"
+			data-ng-click="addrestLink(restlink.rest_endpoint)"
+			data-ng-disabled="!myForm1.msg.$valid">
+			<i class="fa fa-plus-circle"></i> <span>Save</span>
+		</button>
+	</div> --> <!-- 	<div style="padding-left: 30px; padding-top: 50px;"  data-ng-repeat="restlinks in restLinkData">
+		<label class="control-label" for="first">Update Rest Swagger Doc URL</label> 
+		<input id="msg" type="text" class="form-control" name="msg"
+			data-ng-model="restlinks.rest_endpoint" placeholder="Link ..."
+			style="width: 500px; height: 35px;" required>
+	
+		<label class="control-label" for="first">Update Base API URL
+			</label> <input id="msg" type="text" class="form-control" name="msg"
+			data-ng-model="restlinks.base_url" placeholder="Link ..."
+			style="width: 500px; height: 35px;" required>
+ --> <!-- User Credentials --> <!-- <div class="item"> --> <!-- <h3 class="title">App Credentials</h3>
+		<div>		
+			<div>
+				<input ng-model="restlinks.app_token" type="text" class="form-control"
+					id="label" placeholder="App_Token">
+					<br>
+				<input ng-model="restlinks.auth_token"
+					type="text" class="form-control" id="label" placeholder="Auth_Token">
+			</div>
+		</div> --> <!-- <br>
+ 		<button class="btn complete add"
+			data-ng-click="updateRestEdPoint(restlinks)"
+			>
+			<i class="fa fa-plus-circle"></i> <span>Update</span>
+		</button>
+		<button class="btn danger delete"
+			data-ng-click="deleteRestEdPoint(restlinks)" >
+			<i class="fa fa-trash-o"></i> <span>Delete</span>
+		</button> --> <!-- 	</div>
+	</div>
+ --> <tab heading="Activity Design" active="tabactivityactive"
+		select="currentTab()"> <accordion> <accordion-group
+		heading="User Activities" is-open="true" class="user-activities">
+	<div class="activities">
+		<button class="btn complete add" data-ng-disabled="!disableButton"
+			data-ng-init="disabledButton()"
+			data-ng-click="openModal('create','activity','sm');">
+			<i class="fa fa-plus-circle"></i> <span>Add</span>
+		</button>
+		<ul data-ng-if="activities.length">
+			<li data-ng-repeat="a in activities">
+				<h3 class="title lead">{{a.name}}</h3>
+				<h4 class="label">{{a.label}}</h4>
+				<p class="description">{{a.description}}</p> <!--  -->
+				<div class="action">
+					<button class="btn success edit"
+						data-ng-show="a.module_type != 'not_default'"
+						data-ng-click="updateActivity(a.id,a.name)">
+						<i class="fa fa-pencil-square-o"></i> <span>Edit</span>
+					</button>
+					<button class="btn danger delete"
+						data-ng-click="setDeleteActivityObj(a); openModal('delete','activity','sm');">
+						<i class="fa fa-trash-o"></i> <span>Delete</span>
+					</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+	</accordion-group> <accordion-group heading="System Activities">
+	<p>System Activities</p>
+	<div class="activities">
+		<ul data-ng-if="predefined_activities_system.length">
+			<li data-ng-repeat="a in predefined_activities_system">
+				<h3 class="title lead">{{a.name}}</h3>
+				<h4 class="label">{{a.label}}</h4>
+				<p class="description">{{a.description}}</p>
+				<div class="action">
+					<button class="btn complete add"
+						data-ng-disabled="!a.activity_visibility"
+						data-ng-click="addModule(a,json.id)">
+						<i class="fa fa-plus-circle"></i> <span>Add to my project</span>
+					</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+	</accordion-group> <accordion-group heading="Other Activities" class="other-activities">
+	<div class="activities">
+		<ul data-ng-if="predefined_activities_other.length">
+			<li data-ng-repeat="a in predefined_activities_other">
+				<h3 class="title lead">{{a.name}}</h3>
+				<h4 class="label">{{a.label}}</h4>
+				<p class="description">{{a.description}}</p>
+				<div class="action">
+					<button class="btn complete add"
+						data-ng-disabled="!a.activity_visibility"
+						data-ng-click="addModule(a,json.id)">
+						<i class="fa fa-plus-circle"></i> <span>Add to my project</span>
+					</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+	</accordion-group> </accordion> </tab> <tab heading="Menu Builder" active="tabmenuactive"
+		select="currentTab()">
+	<div data-ng-include="'app/views/en-US/user/menu.html'"></div>
+	</tab> <tab heading="Site Template" active="tabsitetemplate"
+		select="currentTab()"> <!-- <div data-ng-include="'app/views/en-US/user/project-template-view.html'"></div> -->
+	<accordion> <accordion-group heading="User Templates"
+		is-open="true" class="user-templates">
+	<div class="templates">
+		<button class="btn complete add"
+			data-ng-click="openModal('create','template','sm');">
+			<i class="fa fa-plus-circle"></i> <span>Add</span>
+		</button>
+		<ul data-ng-if="projectTemplates.length">
+			<li data-ng-repeat="template in projectTemplates">
+				<h3 class="title lead">
+					<i data-ng-class="getDeviceClass(template.device)"></i>&nbsp;{{template.device}}
+					<span data-ng-if="template.device!=null &&template.device!=''">&nbsp;-</span>&nbsp;{{template.name}}
+				</h3>
+				<h4 class="label">{{template.label}}</h4>
+				<p class="description">{{template.description}}</p>
+				<div class="action">
+					<button class="btn success edit"
+						data-ng-click="updateProjectTemplate(template.projectTemplateId, template.device)">
+						<i class="fa fa-pencil-square-o"></i> <span>Edit</span>
+					</button>
+					<button class="btn danger delete"
+						data-ng-click="setDeleteProjectTemplate(template); openModal('delete', 'template', 'sm');">
+						<i class="fa fa-trash-o"></i> <span>Delete</span>
+					</button>
+				</div>
+			</li>
+		</ul>
+	</div>
+	</accordion-group> </accordion> </tab> </tabset>
+</div>
+<footer data-ng-include="'app/views/en-US/footer.html'"></footer>
+
+<div id="invoiceModal" class="modal" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Geppetto Invoice</h4>
+			</div>
+			<div id="printElement" class="modal-body">
+				<div class="col-xs-6 ">
+					<address>
+						<strong>Billed To:</strong> <br> {{profile.firstname}} <br>
+						{{profile.billing_address_line1}} <br> {{profile.city}} <br>
+						{{profile.state}}, {{profile.postalcode}} <br>
+						{{profile.country}}
+					</address>
+				</div>
+				<div class="col-xs-6 text-right">
+					<address>
+						<strong>Date&Time:</strong> <br>
+						<p id="demo"></p>
+						<br> <br>
+					</address>
+				</div>
+				<div  class="row">
+					<div class="col-md-12">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">
+									<strong>Order summary</strong>
+								</h3>
+							</div>
+							<div class="panel-body">
+								<div class="table-responsive">
+									<table class="table table-condensed">
+										<thead>
+											<tr>
+												<td><strong>Item</strong></td>
+												<td class="text-center"><strong>Price</strong></td>
+												<td class="text-center"><strong>Quantity</strong></td>
+												<td class="text-right"><strong>Totals</strong></td>
+											</tr>
+										</thead>
+										<tbody>
+											<!-- foreach ($order->lineItems as $line) or some such thing here -->
+											<tr ng-repeat="payment in paymentdata.shoppingcart">
+												<td>{{payment.itemname}}</td>
+												<td class="text-center">${{payment.price}}</td>
+												<td class="text-center">{{payment.quantity}}</td>
+												<td class="text-right">${{payment.totalprice}}</td>
+											</tr>
+											<tr>
+												<td class="thick-line"></td>
+												<td class="thick-line"></td>
+												<td class="thick-line text-center"><strong>Subtotal</strong>
+												</td>
+												<td class="thick-line text-right">${{totalprice}}</td>
+											</tr>
+											<tr>
+												<td class="no-line"></td>
+												<td class="no-line"></td>
+												<td class="no-line text-center"><strong>Total</strong>
+												</td>
+												<td class="no-line text-right">${{totalprice}}</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="modal-footer">
+					<div class="row">
+						<button type="button" class="btn btn-primary" data-toggle="modal"
+							data-backdrop='static' data-target="#paymentModal"
+							ng-click="payment()">
+							<span class="glyphicon glyphicon-credit-card"></span> Subscribe
+						</button>
+						<button id="printbutton" type="button" onclick="printDiv('printElement')" class="btn btn-default" >Print</button>
+						<button id="printbutton" type="button" ng-click="cancelInvoice()"  class="btn btn-danger" >Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+</div>
+
+<div id="paymentModal" class="modal" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Payment...</h4>
+			</div>
+			<div class="modal-body">
+				<form id="payment-form" ng-submit="payment()">
+					<div class="product-price-tag">
+						<a>${{totalprice}}</a>
+					</div>
+
+					<div id="bt-container"></div>
+					<input type="hidden" id="nonce" name="payment_method_nonce" />
+					<button class="btn btn-primary" type="submit">
+						<span class="glyphicon glyphicon-share-alt"></span> Subscribe
+					</button>
+				</form>
+			</div>
+		</div>
+
+	</div>
+</div>
+<div id="myModalSuccess" class="modal" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span class="glyphicon glyphicon-remove"></span>
+				</button>
+				<h4 class="modal-title">Payment Failure</h4>
+			</div>
+			<div class="modal-body">
+				<div class="alert alert-danger">
+					<p>
+						<strong> Transaction Failed </strong>
+					</p>
+					<br /> Your transaction is <span id="status"></span> <span
+						id="failed"></span>. <br /> Transaction id is: <span
+						id="transValue"></span>
+				</div>
+				<div class="alert alert-info">
+					<p>
+						<strong>Please try again After some time or Please
+							Contact the Geppetto Team</strong>
+					</p>
+				</div>
+			</div>
+			<!-- <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Print</button>
+            </div> -->
+		</div>
+
+	</div>
+</div>
+<div id=freesubscription class="modal" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-body">
+				<center>
+					<img src="app/img/legowelcome.svg" alt="Geppetto" width="50"
+						height="50"><br>
+					<p>Geppetto App Builder</p>
+
+					<p>Congrats...</p>
+					<div class="row">
+						Total Free Generation : {{free}}
+						<div ng-show="generatedapp != appcount">Total App you
+							Generated: {{generatedapp}}</div>
+						<div ng-show="generatedapp == appcount">This is your Last
+							Free Generation</div>
+				</center>
+			</div>
+			<div class="modal-footer">
+				<center>
+					<button class="btn btn-primary subscribe-button"
+						data-dismiss="modal" ng-click="openGenerateModal()">Ok</button>
+				</center>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<div id="paymentwebfail" class="modal" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span class="glyphicon glyphicon-remove"></span>
+				</button>
+				<h4 class="modal-title">Payment Failed</h4>
+			</div>
+			<div class="modal-body">
+				<p>All servers are busy please try again later</p>
+			</div>
+		</div>
+
+	</div>
+
+</div>
+
+
+<div id="instancefailure" class="modal" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">
+					<span class="glyphicon glyphicon-remove"></span>
+				</button>
+				<h4 class="modal-title">Session Failure</h4>
+			</div>
+			<div class="modal-body">
+				<p>Loggin Session Failed Please login once again</p>
+			</div>
+		</div>
+
+	</div>
+
+</div>
+<div id="moneyloader" class="modal" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-body">
+				<p>Transaction is going on, wait a moment ..</p>
+			</div>
+		</div>
+
+	</div>
+
+</div>
+<div id="loader" class="modal" role="dialog">
+	<div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+			<img src="app/img/Double Ring (1).gif"
+				style="z-index: 20; display: block; position: absolute; top: 170px; left: 40%; height: 100px; width: 100px"></img>
+		</div>
+
+	</div>
+
+</div>
+
+</div>
+</div>
+
+<style>
+.product-price-tag {
+	font-size: 18px;
+	line-height: 18px;
+	font-weight: bold;
+	padding: 12px 10px 12px 8px;
+	color: #614611;
+	background: #fdce71;
+	display: block;
+	position: absolute;
+	right: 0;
+	top: 2px;
+	z-index: 5;
+}
+
+.circle-loader {
+	margin: 0 0 30px 10px;
+	border: 2px solid rgba(0, 0, 0, 0.2);
+	border-left-color: #5cb85c;
+	animation-name: loader-spin;
+	animation-duration: 1s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+}
+
+.circle-loader, .circle-loader:after {
+	border-radius: 50%;
+	width: 8em;
+	height: 8em;
+}
+
+.load-complete {
+	-webkit-animation: none;
+	animation: none;
+	border-color: #5cb85c;
+	transition: border 500ms ease-out;
+}
+
+.checkmark {
+	display: none;
+}
+
+.checkmark.draw:after {
+	animation-duration: 800ms;
+	animation-timing-function: ease;
+	animation-name: checkmark;
+	transform: scaleX(-1) rotate(135deg);
+}
+
+.checkmark:after {
+	opacity: 1;
+	height: 4em;
+	width: 2em;
+	transform-origin: left top;
+	border-right: 2px solid #5cb85c;
+	border-top: 2px solid #5cb85c;
+	content: '';
+	left: 2em;
+	top: 4em;
+	position: absolute;
+}
+
+@
+keyframes loader-spin { 0% {
+	transform: rotate(0deg);
+}
+
+100%
+{
+transform
+
+
+
+
+
+
+:
+
+
+
+ 
+
+
+
+rotate
+
+
+
+ 
+
+
+
+(360
+deg
+
+
+
+
+
+
+);
+}
+}
+@
+keyframes checkmark { 0% {
+	height: 0;
+	width: 0;
+	opacity: 1;
+}
+20%
+{
+height
+
+
+
+
+
+
+:
+
+
+
+ 
+
+
+
+0;
+width
+
+
+
+
+
+
+:
+
+
+
+ 
+
+
+
+2
+em
+
+
+
+
+
+
+;
+opacity
+
+
+
+
+
+
+:
+
+
+
+ 
+
+
+
+1;
+}
+40%
+{
+height
+
+
+
+
+
+
+:
+
+
+
+ 
+
+
+
+4
+em
+
+
+
+
+
+
+;
+width
+
+
+
+
+
+
+:
+
+
+
+ 
+
+
+
+2
+em
+
+
+
+
+
+
+;
+opacity
+
+
+
+
+
+
+:
+
+
+
+ 
+
+
+
+1;
+}
+100%
+{
+height
+
+
+
+
+
+
+:
+
+
+
+ 
+
+
+
+4
+em
+
+
+
+
+
+
+;
+width
+
+
+
+
+
+
+:
+
+
+
+ 
+
+
+
+2
+em
+
+
+
+
+
+
+;
+opacity
+
+
+
+
+
+
+:
+
+
+
+ 
+
+
+
+1;
+}
+}
+</style>
+
+
+<script>
+	document.getElementById("demo").innerHTML = Date();
+	$(document).ready(function() {
+		$(".geSidebarContainer").remove();
+		$(".geMenubarContainer").remove();
+		$(".geFooterContainer").remove();
+		$(".geDiagramContainer").remove();
+		$(".geDiagramBackdrop").remove();
+		$(".geToolbarContainer").remove();
+		$(".geHsplit").remove();
+	})
+</script>
