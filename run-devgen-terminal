@@ -1,0 +1,51 @@
+ssh geppetto@52.183.120.127
+username:geppetto
+password:tang3456
+docker ps -a
+docker logs -f devgen
+
+//dinakar
+
+ for dev generator ----------- > docker logs -f devgen
+
+
+For generated Application ----------------------
+
+
+docker exec -ti devgen bash
+
+docker ps -a
+
+docker logs -f <generated application container id>
+
+
+for up the service of failed one---------------------
+
+docker exec -ti <generated application container id> bash
+
+
+
+deployment-------------for devgen
+
+ssh geppetto@52.183.120.127
+
+cd geppetto-stack/gep-devgen/
+
+cd geppettogenerator/
+
+ls
+
+cd geppetto_batch/
+
+git pull
+
+ls
+
+gradle build
+
+docker-compose -f /home/geppetto/geppetto-stack/compose/docker-compose.yml stop gep-devgen
+
+
+docker-compose -f /home/geppetto/geppetto-stack/compose/docker-compose.yml start gep-devgen
+
+

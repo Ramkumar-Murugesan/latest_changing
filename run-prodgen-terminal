@@ -1,0 +1,5 @@
+ssh geppetto@52.183.120.127
+docker ps -a
+docker exec -ti prodgen bash
+docker ps -a
+docker logs -f applicationname
